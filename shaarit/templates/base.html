@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ SHAARIT_NAME }}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="{{ url_for('static', path='pygments_styles.css') }}" rel="stylesheet" />
+
+    <meta name="author" content="{% block author %}{{ SHAARIT_AUTHOR }}{% endblock %}">
+    <meta name="description" content="{% block description %}{{ SHAARIT_DESCRIPTION }}{% endblock %}">
+    {% block keywords %}{% endblock %}
+    <meta name="robots" content="{% block robots %}{{ SHAARIT_ROBOT }}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ SHAARIT_NAME }}">
+    <meta property="og:locale" content="{{ LANGUAGE_CODE }}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{% block og_title %}{{ SHAARIT_NAME }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ SHAARIT_DESCRIPTION }}{% endblock %}">
+    {% block og_image %}{% endblock %}
+</head>
+
+<body {% if edit_link %} onload="document.my_form.id_text.focus();" {% elif add_link %} onload="document.my_form.id_url.focus();" {% endif %}>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <img src="/static/shaarit.png" alt="ShaarIt Snake" width="48" height="43">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="navbar-brand" href="{{ url_for ('home') }}" title="Home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for ('link_create') }}" title="Add a thought, a link, an idea, a note"><i class="fab fa-python link-opacity-50-hover"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for ('tags_list') }}" title="Tags Cloud"><i class="fas fa-tags link-opacity-50-hover"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for ('daily') }}" title="Daily links"><i class=" fas fa-calendar-day link-opacity-50-hover"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for ('link_private') }}" title="Privates Links"><i class=" fas fa-user-secret"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for ('link_public') }}" title="Publics Links"><i class="fas fa-universal-access"></i></a>
+                    </li>
+                </ul>
+                {% if form_search %}
+                {% include 'search.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- container -->
+            {% block content %}
+            {% endblock %}
+            <!--/.container-->
+        </div>
+    </div>
+    <hr>
+    <div class="footer d-flex align-items-center justify-content-center">
+        {% block footer %}
+        <p class="fs-6"> <a class="fab fa-python" href="https://github.com/foxmask/shaarit" title="ShaarIt project homepage"> ShaarIt</a> - share thoughts, ideas, links, notes - <a title="SHAARIT Documentation" href="https://github.com/foxmask/shaarit/blob/main/README.md">documentation</a></p>
+        {% endblock %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+</body>
+
+</html>

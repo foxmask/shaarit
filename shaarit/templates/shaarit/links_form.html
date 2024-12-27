@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+<title>{% block title %}{{ SHAARIT_NAME }} :: New ShaarIt/note{% endblock %}</title>
+{% block content %}
+{% if messages %}
+<div class="alert alert-warning">
+    <ul class="messages">
+        {# for message in messages #}
+        <li{# if message.tags #} class="{# message.tags #}" {# endif #}>{# message #}</li>
+            {# endfor #}
+    </ul>
+</div>
+{% endif %}
+<div class="col-xs-8 col-md-8 col-lg-8 offset-xs-2 offset-md-2 offset-lg-2 mt-3">
+    <form action="" method="post" role="form" name="my_form" class="form-horizontal">
+        {{ form.csrf_token }}
+        <fieldset>
+            {{ form.non_field_errors }}
+            {% if edit_link %}
+            <legend>Update the link/note</legend>
+            {% else %}
+            <legend>Share a link/a note</legend>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="url"> URL</label>
+                {{ form.url(class_='form-control', placeholder='Drop an URL or leave if empty for creating a note') }}
+            </div>
+            {% if form.url.errors %}
+            <div class="alert alert-danger" role="alert">{{ form.url.errors[0] }}</div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="title"> Title</label>
+                {{ form.title(class_='form-control') }}
+            </div>
+            {% if form.title.errors %}
+            <div class="alert alert-danger" role="alert">{{ form.title.errors[0] }}</div>
+            {% endif %}
+            {% if edit_link %}
+            <div class="mb-3">
+                <label class="form-label" for="image"> Image</label>
+                {{ form.image(class_='form-control') }}
+            </div>
+            {% if form.image.errors %}
+            <div class="alert alert-danger" role="alert">{{ form.image.errors[0] }}</div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="video"> Video</label>
+                {{ form.video(class_='form-control') }}
+            </div>
+            {% if form.video.errors %}
+            <div class="alert alert-danger" role="alert">{{ form.video.errors[0] }}</div>
+            {% endif %}
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="text"> Text</label>
+                {{ form.text(class_='form-control', placeholder='content of your note') }}
+            </div>
+            {% if form.text.errors %}
+            <div class="alert alert-danger" role="alert">{{ form.text.errors[0] }}</div>
+            {% endif %}
+            <div class="input-group input-group-sm mb-3">
+                <span class="input-group-text" id="basic-addon1"><i class="fas fa-tags"></i></span>{{ form.tags(class_='form-control', placeholder='tag1,tag2') }}
+            </div>
+            {% if form.tags.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ form.tags.errors[0] }}
+            </div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="private"><i class="fas fa-user-secret"></i> Private</label>
+                {{ form.private(class_='form-check-input') }}
+            </div>
+            {% if form.private.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ form.private.errors[0] }}
+            </div>
+            {% endif %}
+            <div class="mb-3">
+                <label class="form-label" for="sticky"><i class="fas fa-thumbtack"></i> Sticky</label>
+                {{ form.sticky(class_='form-check-input') }}
+            </div>
+            {% if form.sticky.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ form.sticky.errors[0] }}
+            </div>
+            {% endif %}
+            {% if edit_link %}
+            <a type="role" class="btn btn-success" href="{{ url_for ('link_detail', url_hashed=object.url_hashed) }}"><i class="fas fa-long-arrow-alt-left"></i>Back</a>
+            <button type="submit" class="btn btn-primary">Update link</button>
+            {% else %}
+            <a role="button" class="btn btn-success" href="{{ url_for ('home') }}"><i class="fas fa-long-arrow-alt-left"></i>Back</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i>Add link</button>
+            {% endif %}
+            {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+            {% endfor %}
+        </fieldset>
+    </form>
+</div>
+{% endblock %}

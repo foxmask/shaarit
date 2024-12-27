@@ -1,0 +1,10 @@
+-r requirements.txt
+build
+wheel
+coverage
+pipdeptree
+twine
+bandit
+pip-check
+pip-audit
+ruff

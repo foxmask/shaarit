@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+<title>
+    {% block title %}{% if tag == '0Tag' %}
+    {{ SHAARIT_NAME }} :: Links without any tag
+    {% elif tag %}
+    {{ SHAARIT_NAME }} :: Links related to tag {{ tag }}
+    {% elif q %}
+    {{ SHAARIT_NAME }} :: Links related to {{ q }}
+    {% else %}
+    {{ SHAARIT_NAME }}
+    {% endif %}
+    {% endblock %}
+</title>
+{% block og_title %}{% if tag == '0Tag' %}Links without any tag
+{% elif tag %}Links related to tag {{ tag }}
+{% elif q %}Links related to {{ q }}
+{% else %}{{ SHAARIT_NAME }}{% endif %}
+{% endblock %}
+{% block content %}
+<div class="col-xs-8 col-md-8 col-lg-8 offset-xs-2 offset-md-2 offset-lg-2 mt-3">
+    {% if q %}
+    <h1><i class="fas fa-search"></i> Links related to {{ q }}</h1>
+    {% endif %}
+    {% if tag == '0Tag' %}
+    <h1><i class="fas fa-tags"></i> Links without any tag</h1>
+    {% elif tag %}
+    <h1><i class="fas fa-tags"></i> Links related to tag {{ tag }}</h1>
+    {% endif %}
+
+
+    {% include 'shaarit/links_pagination.html' %}
+    {% for object in object_list %}
+    {% include 'shaarit/links_item.html' with context %}
+    {% endfor %}
+    {% include 'shaarit/links_pagination.html' %}
+
+</div> <!-- col-xs-8 col-md-8 col-lg-8 offset-xs-2 offset-md-2 offset-lg-2 mt-3 -->
+{% endblock %}

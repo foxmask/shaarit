@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+<title>{% block title %}{{ SHAARIT_NAME }} :: Daily Links{% endblock %}</title>
+{% block og_title %}Daily Links{% endblock %}
+{% block content %}
+<div class="col-xs-8 col-md-8 col-lg-8 offset-xs-2 offset-md-2 offset-lg-2 mt-3">
+    <h1><i class="fas fa-calendar-day"> Daily Links </i></h1>
+    <h3 class="col-xs-8 col-md-8 col-lg-8 offset-xs-4 offset-md-4 offset-lg-4 mt-3 mb-3">
+        <i class="far fa-calendar-alt"> list of the links of the day </i>
+    </h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col mb-3">
+            {% if previous_date %}
+            <a href="{{ url_for ('daily') }}?yesterday={{ previous_date | filter_datetime }}">
+                <i class="fas fa-long-arrow-alt-left"> </i>
+                <i class="far fa-clock"> {{ previous_date | filter_datetime }}</i>
+            </a>{% endif %}
+        </div>
+        <div class="col mb-3">
+            <h6>{{ current_date | filter_datetime }}</h6>
+        </div>
+        <div class="col mb-3">
+            {% if next_date %}
+            <a href="{{ url_for ('daily') }}?yesterday={{ next_date | filter_datetime }}">
+                <i class="far fa-clock"> {{ next_date | filter_datetime }}</i>
+                <i class="fas fa-long-arrow-alt-right"> </i>
+            </a>{% endif %}
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for data in links %}
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    {% if data.url %}
+                    <h5 class="card-title"><a href="{{ data.url }}">{{ data.title }}</a></h5>
+                    {% else %} {# it is a note #}
+                    <h5><a href="{{ url_for ('link_detail', url_hashed=data.url_hashed) }}">{{ data.title }}</a></h5>
+                    {% endif %}
+                    {% if data.image %}
+                    <img src="{{ data.image }}" class="card-img-top" />
+                    {% endif %}
+                </div>
+                <div class="card-footer text-muted">
+                    {% if data.private %}
+                    <i class="fas fa-key"></i> -
+                    {% endif %}
+                    <i class="far fa-clock"> {{ data.date_created | filter_datetime("%Y-%m-%d %H:%M:%S") }}</i>
+                    {% if data.tags %}
+                    - <i class="fas fa-tags">
+                        {% for tag in data.tags.split(',')%}
+                        {% include 'shaarit/links_tags.html' with context %}
+                        {% endfor %}
+                    </i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

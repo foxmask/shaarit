@@ -1,0 +1,41 @@
+<div class="card {% if object.sticky %}border-info{% endif %}">
+    {% if object.image %}
+    <img src="{{ object.image }}" class="card-img-top" style="width: 20rem;">
+    {% endif %}
+    <div class="card-body">
+        {% if object.url %}
+        <h5><a href="{{ object.url }}">{{ object.title }}</a></h5>
+        {% else %}
+        <h5><a href="{{ url_for ('links_detail', url_hashed=object.url_hashed) }}">{{ object.title }}</a></h5>
+        {% endif %}
+        {% if object.video %}
+        <div class="ratio ratio-16x9">
+            <iframe src="{{ object.video }}" title="video" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+        <div class="card-text">{{ object.text | truncate(500) | filter_markdown | safe }}</div>
+    </div>
+    <div class="card-footer text-muted">
+        {% if object.sticky %}
+        <i class="fas fa-thumbtack"></i> Sticky -
+        {% endif %}
+        {% if object.private %}
+        <i class="fas fa-user-secret"> Private</i> -
+        {% endif %}
+        <i class="far fa-clock"> {{ object.date_created | filter_datetime("%Y-%m-%d %H:%M:%S")}} </i> -
+        <a role="button" href="{{ url_for ('link_edit', link_id=object.id) }}" class="btn btn-outline-primary btn-sm">
+            <i class="far fa-edit"> edit </i>
+        </a>
+        <a role="button" href="{{ url_for ('link_delete', link_id=object.id) }}" class="btn btn-outline-danger btn-sm">
+            <i class="far fa-trash-alt"> delete </i>
+        </a>
+        <a href="{{ url_for ('link_detail', url_hashed=object.url_hashed) }}">Permalink</a> - {% if object.url %}{{ object.url }}{% else %}{{ url_for ('links_detail', url_hashed=object.url_hashed) }}{% endif %}
+        {% if object.tags %}
+        - <i class="fas fa-tags">
+            {% for tag in object.tags.split(',')%}
+            {% include 'shaarit/links_tags.html' with context %}
+            {% endfor %}
+        </i>
+        {% endif %}
+    </div>
+</div>

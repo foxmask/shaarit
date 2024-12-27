@@ -1,0 +1,9 @@
+starlette==0.42.0
+starlette-wtf==0.4.5
+uvicorn==0.34.0
+tortoise-orm==0.23.0
+Markdown==3.7
+Pygments==2.18.0
+rich==13.9.4
+python-slugify==8.0.4
+Jinja2==3.1.5
