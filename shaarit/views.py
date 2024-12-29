@@ -12,8 +12,9 @@ from starlette.routing import Route
 from starlette.templating import Jinja2Templates
 from starlette_wtf import csrf_protect
 from tortoise.exceptions import DoesNotExist
+from tortoise.expressions import Q
 
-from shaarit.forms import LinksForm, LinksFormEdit
+from shaarit.forms import LinksForm, LinksFormEdit, SearchForm
 from shaarit.hashed_url import small_hash
 from shaarit.models import Links
 from shaarit.template_filters import filter_datetime, filter_markdown
@@ -23,10 +24,38 @@ templates.env.filters["filter_markdown"] = filter_markdown
 templates.env.filters["filter_datetime"] = filter_datetime
 
 
+def url_cleaning(url: str) -> str:
+    """
+    drop unexpected content of the URL from the bookmarklet
+
+    param url: url of the website
+    :return string url
+    """
+
+    if url:
+        for pattern in ("&utm_source=", "?utm_source=", "&utm_medium=", "#xtor=RSS-"):
+            pos = url.find(pattern)
+            if pos > 0:
+                url = url[0:pos]
+    return url
+
+
 async def home(request):
     limit = request.state.config["LINKS_PER_PAGE"]
     offset = int(request.query_params.get("offset", 0))
-    links = await Links.all().offset(offset).limit(limit).order_by("-date_created")
+
+    form_search = await SearchForm.from_formdata(request)
+
+    if await form_search.validate_on_submit():
+        q = form_search.q.data
+        links = (
+            await Links.filter(Q(title__icontains=q) | Q(text__icontains=q))
+            .offset(offset)
+            .limit(limit)
+            .order_by("-date_created")
+        )
+    else:
+        links = await Links.all().offset(offset).limit(limit).order_by("-date_created")
     # totals
     total_count = await Links.all().count()
     total_pages = (total_count + limit - 1) // limit
@@ -38,6 +67,7 @@ async def home(request):
         "total_count": total_count,
         "total_pages": total_pages,
         "object_list": links,
+        "form_search": form_search,
         "url": request.url_for("home"),
     }
 
@@ -46,7 +76,21 @@ async def home(request):
 
 @csrf_protect
 async def link_create(request):
-    form = await LinksForm.from_formdata(request)
+    initial = {}
+
+    # to manage the bookmarklet
+    if request.query_params.get("post"):
+        url = request.query_params.get("post")
+        title = request.query_params.get("title")
+        url = url_cleaning(str(url))
+        initial = ImmutableMultiDict(
+            {
+                "url": url,
+                "title": title,
+            }
+        )
+
+    form = await LinksForm.from_formdata(request, initial)
 
     if await form.validate_on_submit():
         try:
@@ -297,7 +341,7 @@ async def link_public(request):
 
 
 shaarit_routes = [
-    Route("/", endpoint=home, methods=["GET"]),
+    Route("/", endpoint=home, methods=["GET", "POST"]),
     Route("/new/", endpoint=link_create, methods=["GET", "POST"]),
     Route("/edit/{link_id}", endpoint=link_edit, methods=["GET", "POST"]),
     Route("/link/{url_hashed}", endpoint=link_detail, methods=["GET"]),

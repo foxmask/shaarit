@@ -1,5 +1,5 @@
-<form class="d-flex mr-4 ml-4" action="#" role="search" method="get">
-    {% csrf_token %}
-    {{ form_search.q }}
+<form class="d-flex mr-4 ml-4" action="{{ url_for('home') }}" role="search" method="post">
+    {{ form_search.csrf_token }}
+    {{ form_search.q(class_='form-control') }}
     <button class="btn btn-outline-success" type="submit"><i class="fas fa-search">Search</i></button>
 </form>

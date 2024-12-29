@@ -49,9 +49,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for ('link_public') }}" title="Publics Links"><i class="fas fa-universal-access"></i></a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:(function(){var%20url%20=%20location.href;var%20title%20=%20document.title%20||%20url;window.open('{{ hostname }}/new/?post='%20+%20encodeURIComponent(url)+'&title='%20+%20encodeURIComponent(title)+'&source=bookmarklet','_blank','menubar=no,height=390,width=600,toolbar=no,scrollbars=no,status=no,dialog=1');})();"><i class="fas fa-plus"></i>share it</a>
+                    </li>
                 </ul>
                 {% if form_search %}
-                {% include 'search.html' %}
+                {% include 'shaarit/search.html' %}
                 {% endif %}
             </div>
         </div>
