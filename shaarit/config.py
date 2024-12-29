@@ -9,8 +9,6 @@ from starlette.datastructures import CommaSeparatedStrings, Secret
 config = Config(".env")
 
 DEBUG = config("DEBUG", cast=bool, default=False)
-SECRET_KEY = config("SECRET_KEY", cast=Secret)
-CSRF_SECRET = config("CSRF_SECRET", cast=Secret)
 
 DATABASE_URL = config("DATABASE_URL", default="sqlite://db.sqlite3")
 LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr-fr")

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-<title>{% block title %}{{ SHAARIT_NAME }} :: {{ object.title }} {% endblock %}</title>
+<title>{% block title %}{{ config.SHAARIT_NAME }} :: {{ object.title }} {% endblock %}</title>
 {% block og_title %}{{ object.title }}{% endblock %}
 {% if object.title %}
-{% block description %}{{ SHAARIT_DESCRIPTION }}{% endblock %}
-{% block og_description %}{{ SHAARIT_DESCRIPTION }}{% endblock %}
+{% block description %}{{ config.SHAARIT_DESCRIPTION }}{% endblock %}
+{% block og_description %}{{ config.SHAARIT_DESCRIPTION }}{% endblock %}
 {% endif %}
 {% if object.tags %}
 {% block keywords %}

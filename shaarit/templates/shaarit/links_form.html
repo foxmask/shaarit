@@ -1,15 +1,6 @@
 {% extends "base.html" %}
-<title>{% block title %}{{ SHAARIT_NAME }} :: New ShaarIt/note{% endblock %}</title>
+<title>{% block title %}{{ config.SHAARIT_NAME }} :: Link/note{% endblock %}</title>
 {% block content %}
-{% if messages %}
-<div class="alert alert-warning">
-    <ul class="messages">
-        {# for message in messages #}
-        <li{# if message.tags #} class="{# message.tags #}" {# endif #}>{# message #}</li>
-            {# endfor #}
-    </ul>
-</div>
-{% endif %}
 <div class="col-xs-8 col-md-8 col-lg-8 offset-xs-2 offset-md-2 offset-lg-2 mt-3">
     <form action="" method="post" role="form" name="my_form" class="form-horizontal">
         {{ form.csrf_token }}

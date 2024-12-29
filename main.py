@@ -3,8 +3,6 @@
 2025 - ShaarIt - 셔릿
 """
 
-import logging
-
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
@@ -17,9 +15,8 @@ from tortoise.contrib.starlette import register_tortoise
 from uvicorn.main import run
 
 from shaarit import config
+from shaarit.middleware import ConfigMiddleware
 from shaarit.views import shaarit_routes
-
-logging.basicConfig(level=logging.DEBUG)
 
 app = Starlette(
     debug=config.DEBUG,
@@ -29,6 +26,7 @@ app = Starlette(
         Middleware(CSRFProtectMiddleware, csrf_secret=config.CSRF_SECRET),
         Middleware(CORSMiddleware, allow_origins=config.ALLOW_ORIGINS),
         Middleware(TrustedHostMiddleware, allowed_hosts=config.ALLOWED_HOSTS),
+        Middleware(ConfigMiddleware),
     ],
     routes=[
         Mount("/static", app=StaticFiles(directory="shaarit/static"), name="static"),

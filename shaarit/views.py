@@ -13,7 +13,6 @@ from starlette.templating import Jinja2Templates
 from starlette_wtf import csrf_protect
 from tortoise.exceptions import DoesNotExist
 
-from shaarit import config
 from shaarit.forms import LinksForm, LinksFormEdit
 from shaarit.hashed_url import small_hash
 from shaarit.models import Links
@@ -24,39 +23,23 @@ templates.env.filters["filter_markdown"] = filter_markdown
 templates.env.filters["filter_datetime"] = filter_datetime
 
 
-def app_settings():
-    context = {
-        "SHAARIT_NAME": config.SHAARIT_NAME,
-        "SHAARIT_AUTHOR": config.SHAARIT_AUTHOR,
-        "SHAARIT_DESCRIPTION": config.SHAARIT_DESCRIPTION,
-        "SHAARIT_ROBOT": config.SHAARIT_ROBOT,
-        "SHAARIT_URL": config.SHAARIT_URL,
-        "SHAARIT_TZ": config.SHAARIT_TZ,
-        "LINKS_PER_PAGE": config.LINKS_PER_PAGE,
-        "DAILY_PER_PAGE": config.DAILY_PER_PAGE,
-    }
-    return context
-
-
 async def home(request):
-    limit = config.LINKS_PER_PAGE
+    limit = request.state.config["LINKS_PER_PAGE"]
     offset = int(request.query_params.get("offset", 0))
     links = await Links.all().offset(offset).limit(limit).order_by("-date_created")
     # totals
     total_count = await Links.all().count()
     total_pages = (total_count + limit - 1) // limit
 
-    context = app_settings()
-    context.update(
-        {
-            "offset": offset,
-            "limit": limit,
-            "total_count": total_count,
-            "total_pages": total_pages,
-            "object_list": links,
-            "url": request.url_for("home"),
-        }
-    )
+    context = {
+        "config": request.state.config,
+        "offset": offset,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "object_list": links,
+        "url": request.url_for("home"),
+    }
 
     return templates.TemplateResponse(request, name="shaarit/links_list.html", context=context)
 
@@ -83,8 +66,11 @@ async def link_create(request):
         url = request.url_for("link_detail", url_hashed=link.url_hashed)
         return RedirectResponse(url=url, status_code=303)
 
-    context = app_settings()
-    context.update({"form": form, "edit_link": False})
+    context = {
+        "config": request.state.config,
+        "form": form,
+        "edit_link": False,
+    }
 
     return templates.TemplateResponse(request, name="shaarit/links_form.html", context=context)
 
@@ -126,8 +112,7 @@ async def link_edit(request):
         url = request.url_for("link_detail", url_hashed=link.url_hashed)
         return RedirectResponse(url=url, status_code=303)
 
-    context = app_settings()
-    context.update({"object": link, "form": form, "edit_link": True})
+    context = {"config": request.state.config, "object": link, "form": form, "edit_link": True}
 
     return templates.TemplateResponse(request, name="shaarit/links_form.html", context=context)
 
@@ -136,8 +121,7 @@ async def link_detail(request):
     url_hashed = request.path_params["url_hashed"]
     link = await Links.get(url_hashed=url_hashed)
 
-    context = app_settings()
-    context.update({"object": link})
+    context = {"config": request.state.config, "object": link}
 
     return templates.TemplateResponse(request, name="shaarit/links_detail.html", context=context)
 
@@ -167,14 +151,13 @@ async def tags_list(request):
     for my_tag in tags:
         tags_dict.update({my_tag: tags.count(my_tag)})
 
-    context = app_settings()
-    context.update({"tags": tags_dict})
+    context = {"config": request.state.config, "tags": tags_dict}
 
     return templates.TemplateResponse(request, name="shaarit/tags_list.html", context=context)
 
 
 async def links_by_tag_list(request):
-    limit = config.LINKS_PER_PAGE
+    limit = request.state.config["LINKS_PER_PAGE"]
     offset = int(request.query_params.get("offset", 0))
 
     tags = None if request.path_params["tags"] == "0Tag" else request.path_params["tags"]
@@ -201,18 +184,16 @@ async def links_by_tag_list(request):
     total_count = await Links.all().count()
     total_pages = (total_count + limit - 1) // limit
 
-    context = app_settings()
-    context.update(
-        {
-            "offset": offset,
-            "limit": limit,
-            "total_count": total_count,
-            "total_pages": total_pages,
-            "object_list": links,
-            "tags": tags,
-            "url": url,
-        }
-    )
+    context = {
+        "config": request.state.config,
+        "offset": offset,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "object_list": links,
+        "tags": tags,
+        "url": url,
+    }
 
     return templates.TemplateResponse(request, name="shaarit/links_list.html", context=context)
 
@@ -226,7 +207,7 @@ async def daily(request):
     next_date = ""
     previous_date = ""
 
-    now = datetime.now(tz=pytz.timezone(config.SHAARIT_TZ))
+    now = datetime.now(tz=pytz.timezone(request.state.config["SHAARIT_TZ"]))
     today = date.today()
 
     yesterday = request.query_params.get("yesterday", None)
@@ -262,61 +243,55 @@ async def daily(request):
         "-date_created"
     )
 
-    context = app_settings()
-    context.update(
-        {
-            "previous_date": previous_date,
-            "next_date": next_date,
-            "current_date": yesterday,
-            "links": data,
-        }
-    )
+    context = {
+        "config": request.state.config,
+        "previous_date": previous_date,
+        "next_date": next_date,
+        "current_date": yesterday,
+        "links": data,
+    }
 
     return templates.TemplateResponse(request, name="shaarit/daily_list.html", context=context)
 
 
 async def link_private(request):
-    limit = config.LINKS_PER_PAGE
+    limit = request.state.config["LINKS_PER_PAGE"]
     offset = int(request.query_params.get("offset", 0))
     links = await Links.filter(private=True).offset(offset).limit(limit).order_by("-date_created")
     # totals
     total_count = await Links.all().count()
     total_pages = (total_count + limit - 1) // limit
 
-    context = app_settings()
-    context.update(
-        {
-            "offset": offset,
-            "limit": limit,
-            "total_count": total_count,
-            "total_pages": total_pages,
-            "object_list": links,
-            "url": request.url_for("link_private"),
-        }
-    )
+    context = {
+        "config": request.state.config,
+        "offset": offset,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "object_list": links,
+        "url": request.url_for("link_private"),
+    }
 
     return templates.TemplateResponse(request, name="shaarit/links_list.html", context=context)
 
 
 async def link_public(request):
-    limit = config.LINKS_PER_PAGE
+    limit = request.state.config["LINKS_PER_PAGE"]
     offset = int(request.query_params.get("offset", 0))
     links = await Links.filter(private=False).offset(offset).limit(limit).order_by("-date_created")
     # totals
     total_count = await Links.all().count()
     total_pages = (total_count + limit - 1) // limit
 
-    context = app_settings()
-    context.update(
-        {
-            "offset": offset,
-            "limit": limit,
-            "total_count": total_count,
-            "total_pages": total_pages,
-            "object_list": links,
-            "url": request.url_for("link_public"),
-        }
-    )
+    context = {
+        "config": request.state.config,
+        "offset": offset,
+        "limit": limit,
+        "total_count": total_count,
+        "total_pages": total_pages,
+        "object_list": links,
+        "url": request.url_for("link_public"),
+    }
 
     return templates.TemplateResponse(request, name="shaarit/links_list.html", context=context)
 
