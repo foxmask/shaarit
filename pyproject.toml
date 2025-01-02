@@ -3,9 +3,9 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "shaarit"
+name = "shaarpy-starlette"
 version = "0.0.1"
-description = "ShaarIt: Share your thoughts, links, ideas, notes. self-hosting bookmarks and micro blogging. If you ever wanted Shaarli in python, that's it ^_* (w/ starlette)"
+description = "Shaarpy Starlette: Share your thoughts, links, ideas, notes. self-hosting bookmarks and micro blogging. If you ever wanted Shaarli in python, that's it ^_* (w/ starlette)"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"
@@ -37,9 +37,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/foxmask/shaarit/"
-Documentation = "https://github.com/foxmask/shaarit/blob/main/README.md"
-Source = "https://github.com/foxmask/shaarit/"
+Homepage = "https://github.com/foxmask/shaarpy-starlette/"
+Documentation = "https://github.com/foxmask/shaarpy-starlette/blob/main/README.md"
+Source = "https://github.com/foxmask/shaarpy-starlette/"
 
 [tool.ruff]
 line-length = 100
